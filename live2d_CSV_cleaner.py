@@ -1,7 +1,5 @@
-from doctest import DocFileSuite
 import sys
 import pandas as pd
-from sys import argv
 import re
 
 # @author: LobsterMatsuri
