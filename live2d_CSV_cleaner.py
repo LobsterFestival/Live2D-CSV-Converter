@@ -25,16 +25,12 @@ import re
 # Parameters:
 # DataFrame : dataframe row, we can edit inplace.
 # Index : location of row to modify in place
-
-
 def cleanText(df, index):
     # Pull 'Name' string out of df structure put into `str`
     str = df.at[index, 'Name']
     # strip leading and trailing whitespace, FIXME: probably a more pythonic way to do this
     str = str.lstrip()
     str = str.rstrip()
-
-    # special character strip, only space, _, and numbers are valid IDs
 
     id = df.at[index, 'ID']
 
@@ -97,8 +93,6 @@ def cleanText(df, index):
 # If duplicates are found, will modify the ID in place
 # NOTE: This should be refactored, because doing this for Every ID in the dataframe is not great
 # FIXME: / WANT: Look into using an apply() function over the data frame for this maybe at the end?
-
-
 def handleDuplicates(df, index, dupList):
     # Pull string from dataframe
     strToCheck = df.at[index, 'ID']
@@ -125,8 +119,6 @@ def handleDuplicates(df, index, dupList):
 # Credit: https://thispointer.com/python-find-duplicates-in-a-list-with-frequency-count-index-positions/
 # Parameters
 # dupList : List we want to check for duplicates
-
-
 def findDuplicatesWithCount(dupList):
     dictOfElems = dict()
     # Iterate over each element in list
@@ -164,22 +156,3 @@ def main():
 
 # eskeetit
 main()
-
-
-# import CSV, 4 columns GUID (ignore), Type (ARTMESH is a layer, PART is a folder designation)
-# ID : unique ID relating to name, ideally should match name, no special characters, no spaces
-# Name: The name of layer or folder,
-
-# loop through CSV entries
-
-# WANTS:
-# 1.)
-# If children of a parent folder (anything between two TYPE=Part) are just numbers
-# we should rename them to be based on the parent folder name
-# i.e folder is called hair and everything under it is 1 , 2, 3
-# these should be renamed to hair_1, hair_2, hair_{number}
-# Just make sure all IDs are unique amongst parts and artmeshs
-# 2.) GUI
-# Lmao, lol i'll look out for a pull request or fork.
-# 3.) Unit testing to ensure proper ID formating
-# 4.) EXE releases, drag and drop for file export, with a custom icon per @cillas request
