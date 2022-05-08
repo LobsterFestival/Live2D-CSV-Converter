@@ -2,16 +2,19 @@
 Changes ID field to match Name field within Live2D ID constraints
 
 ## Still to Come...
-An exe release that allows drag and drop conversion
-
 A fork thats has a minimal GUI for adding and naming output file
 
 A requirements.txt for python environment setup
 
+### PLEASE NOTE
+You need to have you Live2D project open during the export from Live2D and during the conversion process, then import the `corrected.csv` back into Live2D.
+
+To export or import the CSV file, in Live2D navigate to the top menu and go to Modeling>Bulk setting of model objects>Export/Import
+
 ## Requirements
 This program is dependent on:
 
-pandas for dataframe
+pandas for dataframe structure
 `pip install pandas`
 
 ## Usage
