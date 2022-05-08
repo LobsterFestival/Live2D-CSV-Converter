@@ -157,7 +157,7 @@ def main():
     # now we can write the dataframe to a new CSV file
 
     # FIXME: another arg for new filename
-    filename = "regression_test_fixed.csv"
+    filename = "corrected.csv"
     # Need UTF-8 because original file could have non-ascii characters, original file has UNIX line endings
     df.to_csv(filename, encoding='utf-8', index=False, line_terminator='\n')
 
