@@ -35,7 +35,7 @@ def cleanText(df, index):
     id = df.at[index, 'ID']
 
     # Don't mess with folder names at all
-    if df.at[index, 'Type'] == "PART":
+    if df.at[index, 'Types'] == "PART":
         return
 
     # Don't edit an ID of a file if its valid, could conflict with Part names
