@@ -22,7 +22,7 @@ Of course after the import is completed, the Live2D project can be closed an reo
 ## Requirements
 This program is dependent on:
 
-pandas for dataframe structure
+Latest Version of pandas for dataframe structure (currently working on 2.0+)
 `pip install pandas`
 
 ## Usage
