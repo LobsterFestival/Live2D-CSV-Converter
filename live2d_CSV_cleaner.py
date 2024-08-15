@@ -3,7 +3,7 @@ import pandas as pd
 import re
 
 # @author: LobsterMatsuri
-# @date: May 7th, 2022
+# @date: August 15th, 2024
 # thanks: @cillia for regression testing 
 
 # CONSTRAINTS
@@ -17,10 +17,10 @@ import re
 # But there are cases where we have duplicate malformed names that get their ID's set to ArtMesh{n}
 # So when we clean the NAMEs to be compliant, we need to check if we have a duplicate of that name
 # We have already updated the ID to be the new name,
-# and if we do we need to adjust the ID to be {CLEANED_NAME + occurance_count}
+# and if we do we need to adjust the ID to be {CLEANED_NAME + occurrence_count}
 # Two parts named Left Eyelash would become -> Left_Eyelash & Left_Eyelash2
-# The handleDuplicates() fuction will take the n-th occurance of a cleaned NAME and fix its id
-# it needs the NAME string, the row that it is from, and the occurance number
+# The handleDuplicates() function will take the n-th occurrence of a cleaned NAME and fix its id
+# it needs the NAME string, the row that it is from, and the occurrence number
 
 # Parameters:
 # DataFrame : dataframe row, we can edit inplace.
@@ -28,23 +28,28 @@ import re
 def cleanText(df, index):
     # Pull 'Name' string out of df structure put into `str`
     str = df.at[index, 'Name']
-    # strip leading and trailing whitespace, FIXME: probably a more pythonic way to do this
+    # strip leading and trailing whitespace
     str = str.lstrip()
     str = str.rstrip()
 
     id = df.at[index, 'ID']
 
-    # Don't mess with folder names at all
+    # prepend 'part_' to all PART IDs, keep name the same
     if df.at[index, 'Types'] == "PART":
+        str = "Part_" + str
+        if len(str) >= 63:
+            print(f"New Part ID length is greater than 63 Characters! This is not allowed!")
+        df.at[index, 'ID'] = str
         return
+        
 
-    # Don't edit an ID of a file if its valid, could conflict with Part names
+    # DEPRECATED: Don't edit an ID of a file if its valid, could conflict with Part names
     # e.g ArtMesh called "Belly" might have an ID of "Belly2"
     # because its under the folder "Belly" with an id of "Belly"
-    artMeshSubString = "ArtMesh"
-    status = id.find(artMeshSubString)
-    if status == -1:
-        return
+    # artMeshSubString = "ArtMesh"
+    # status = id.find(artMeshSubString)
+    # if status == -1:
+    #     return
 
     ogStr = str
     # if 'Name' has non ascii characters, ignore them.
@@ -56,7 +61,7 @@ def cleanText(df, index):
             return
 
     # if NAME has < or > characters rename that substring section to R (<) or L (>)
-    # These seem flipped but Live2D uses character based directions {reword this}
+    # These seem flipped but Live2D uses stage directions
     str = str.replace("<", "R")
     str = str.replace(">", "L")
 
@@ -64,7 +69,7 @@ def cleanText(df, index):
     if str[0].isdigit():
         str = "AM" + str
 
-    # if NAME contains spaces, the ID column of that row needs to be changed to name_like_this, name column doesnt need to change.
+    # if NAME contains spaces, the ID column of that row needs to be changed to name_like_this, name column doesn't need to change.
     str = str.replace(" ", "_")
     # if NAME has any dashes (-) they should be converted to underscore (_)
     str = str.replace("-", "_")
@@ -72,9 +77,9 @@ def cleanText(df, index):
     str = re.sub(r'\W+', "", str)
     # set the ID to our sanitized string
     # Modify in place
-    if len(str) > 64:
+    if len(str) >= 63:
         print(
-            f"New ID length is greater than 64 Characters! This is not allowed! Shorten the name of {ogStr}, keeping ID as {df.at[index, 'ID']}")
+            f"New ID length is greater than 63 Characters! This is not allowed! Shorten the name of {ogStr}, keeping ID as {df.at[index, 'ID']}")
         return
     # if for some reason our new ID is blank (invalid), error and show conflicting 
     if str == "":
@@ -88,7 +93,7 @@ def cleanText(df, index):
 # Parameters:
 # DataFrame : DataFrame object
 # Index: index of current row we are looking at
-# dupList : our list of duplicates, yes I know passing it everytime isnt the best way.
+# dupList : our list of duplicates, yes I know passing it everytime isn't the best way.
 # This function will be our set (not really a set) that we use to prevent duplicate IDs
 # If duplicates are found, will modify the ID in place
 # NOTE: This should be refactored, because doing this for Every ID in the dataframe is not great
@@ -96,13 +101,14 @@ def cleanText(df, index):
 def handleDuplicates(df, index, dupList):
     # Pull string from dataframe
     strToCheck = df.at[index, 'ID']
-    # Temp list used because we dont want to append to dupList unless it is unique
-    tempList = list(dupList)
-    tempList.append(strToCheck)
+
+    dupList.append(strToCheck)
+
     # Check if we already have this item in the list
-    dupDict = findDuplicatesWithCount(tempList)
+    dupDict = findDuplicatesWithCount(dupList)
     matched = False
     for key, value in dupDict.items():
+        print(f"DEBUG: key: {key} value: {value}")
         # It is a duplicate
         if strToCheck == key:
             # Append occurance count to ID string to make unique
@@ -110,10 +116,9 @@ def handleDuplicates(df, index, dupList):
             strToCheck = strToCheck + str(value)
             # Modify dataframe row in place
             df.at[index, 'ID'] = strToCheck
-    # if no matches, add to our list because this is the first occurance.
+    # if no matches, add to our list because this is the first occurrence.
     if not matched:
         dupList.append(strToCheck)
-
     return
 
 # Credit: https://thispointer.com/python-find-duplicates-in-a-list-with-frequency-count-index-positions/
@@ -132,7 +137,8 @@ def findDuplicatesWithCount(dupList):
     # Filter key-value pairs in dictionary. Keep pairs whose value is greater than 1 i.e. only duplicate elements from list.
     dictOfElems = {key: value for key,
                    value in dictOfElems.items() if value > 1}
-    # Returns a dict of duplicate elements and thier frequency count
+    # Returns a dict of duplicate elements and their frequency count
+    print(f"dict of Elements: {dictOfElems}")
     return dictOfElems
 
 
@@ -151,7 +157,7 @@ def main():
     # FIXME: another arg for new filename
     filename = "corrected.csv"
     # Need UTF-8 because original file could have non-ascii characters, original file has UNIX line endings
-    df.to_csv(filename, encoding='utf-8', index=False, line_terminator='\n')
+    df.to_csv(filename, encoding='utf-8', index=False, lineterminator='\n')
 
 
 # eskeetit

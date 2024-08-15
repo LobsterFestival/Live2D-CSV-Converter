@@ -3,8 +3,6 @@ Never again wonder what the hell ArtMesh156 is when setting up clipping masks or
 
 Updates the ArtMesh ID field to match the ArtMesh Name field within the ArtMesh ID fields naming constraints.
 
-Live2D IDs can only have alpanumeric characters and underscores.
-
 ## Still to Come...
 A fork thats has a minimal GUI for adding and naming output file
 
@@ -18,6 +16,11 @@ To export or import the CSV file, in Live2D navigate to the top menu and go to M
 This is a Live2D constraint on how they handle the GUIDs, if the project is closed and then you try to import, the import will fail, because the GUIDs will be different. Unfortunately this cant be worked around as there is no way to "know" what the new GUIDs will be. 
 
 Of course after the import is completed, the Live2D project can be closed an reopened as normal. Think of the GUIDs as relating to an instance of Live2D.
+
+### ID Rules
+All Live2D IDs must to be unique. 
+IDs can only have alphanumeric characters and underscores and must be shorter than 64 characters long.
+IDs must start with a letter.
 
 ## Requirements
 This program is dependent on:
