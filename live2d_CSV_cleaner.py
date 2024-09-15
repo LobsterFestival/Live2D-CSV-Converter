@@ -35,8 +35,15 @@ def cleanText(df, index):
     id = df.at[index, 'ID']
 
     # prepend 'part_' to all PART IDs, keep name the same
+    # clean characters the same
     if df.at[index, 'Types'] == "PART":
         str = "Part_" + str
+        # if NAME contains spaces, the ID column of that row needs to be changed to name_like_this, name column doesn't need to change.
+        str = str.replace(" ", "_")
+        # if NAME has any dashes (-) they should be converted to underscore (_)
+        str = str.replace("-", "_")
+        # strip anything thats not space, _ , or alphanumeric
+        str = re.sub(r'\W+', "", str)
         if len(str) >= 63:
             print(f"New Part ID length is greater than 63 Characters! This is not allowed!")
         df.at[index, 'ID'] = str
